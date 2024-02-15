@@ -32,7 +32,7 @@ class _categoryState extends State<category>with SingleTickerProviderStateMixin 
         Tab(text: "Expense"),
       ] 
       ),
-      Expanded(
+      Expanded( 
         child: TabBarView(
           controller: _tabcontroller,
           children:const [
