@@ -17,10 +17,7 @@ class _categoryState extends State<category>with SingleTickerProviderStateMixin 
   @override
   void initState() {
     _tabcontroller = TabController(length: 2, vsync: this);
-    categoryDB().getCategories().then((value) {
-      print("Categories get");
-      print(value.toString());
-    });
+    categoryDB().refreshUI();
     super.initState();
   }
 
