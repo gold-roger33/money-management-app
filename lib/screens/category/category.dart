@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:p_money_management/db/category/category_db.dart';
 import 'package:p_money_management/screens/category/expense_cat.dart';
 import 'package:p_money_management/screens/category/income_cat.dart';
 
@@ -16,6 +17,10 @@ class _categoryState extends State<category>with SingleTickerProviderStateMixin 
   @override
   void initState() {
     _tabcontroller = TabController(length: 2, vsync: this);
+    categoryDB().getCategories().then((value) {
+      print("Categories get");
+      print(value.toString());
+    });
     super.initState();
   }
 

@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 part 'category_model.g.dart';
 
@@ -33,4 +34,12 @@ class categoryModel{
     required this.type
   }
    );
+
+  @override
+  String toString(){
+    return '{$name $type}' ;
+  }
+
+
 }
+
