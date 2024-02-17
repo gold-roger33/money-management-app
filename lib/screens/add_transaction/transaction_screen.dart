@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:p_money_management/db/category/category_db.dart';
+import 'package:p_money_management/db/transactions/transaction_db.dart';
+import 'package:p_money_management/db/transactions/transaction_model.dart';
 import 'package:p_money_management/model/category/category_model.dart';
 
 class screentransaction extends StatefulWidget {
@@ -14,9 +16,10 @@ class _screentransactionState extends State<screentransaction> {
   DateTime? _selectedDate;
   categoryType? _selectedCategorytype;
   categoryModel? _selectedCategoryModel;
-  
-  String? _categoryid;
 
+  String? _categoryid;
+  final _purposeTextEditingcontroller = TextEditingController();
+  final _amoutnTextEditingcontroller = TextEditingController();
   @override
   void initState() {
     _selectedCategorytype = categoryType.income;
@@ -34,6 +37,7 @@ class _screentransactionState extends State<screentransaction> {
                   children: [
                     //PURPOSE
                     TextFormField(
+                      controller: _purposeTextEditingcontroller,
                       keyboardType: TextInputType.text,
                       decoration: const InputDecoration(
                         hintText: "purpose",
@@ -42,6 +46,7 @@ class _screentransactionState extends State<screentransaction> {
 
                     //AMOUNT
                     TextFormField(
+                      controller: _amoutnTextEditingcontroller,
                       keyboardType: TextInputType.number,
                       decoration: const InputDecoration(
                         hintText: "Amount",
@@ -99,7 +104,7 @@ class _screentransactionState extends State<screentransaction> {
                               onChanged: (newvalue) {
                                 setState(() {
                                   _selectedCategorytype = categoryType.expense;
-                                  _categoryid =null;
+                                  _categoryid = null;
                                 });
                               },
                             ),
@@ -110,7 +115,7 @@ class _screentransactionState extends State<screentransaction> {
                     ),
 
                     //CATEGORY TYPE
-                    DropdownButton(
+                    DropdownButton<String>(
                         hint: const Text("Select category"),
                         value: _categoryid,
                         items: (_selectedCategorytype == categoryType.income
@@ -119,11 +124,16 @@ class _screentransactionState extends State<screentransaction> {
                             .value
                             .map((e) {
                           return DropdownMenuItem(
-                              value: e.id, child: Text(e.name));
+                              value: e.id,
+                               child: Text(e.name),
+                               onTap: (){
+                                _selectedCategoryModel = e;
+                               },
+                               );
                         }).toList(),
                         onChanged: (selectedvalue) {
                           setState(() {
-                          _categoryid=selectedvalue;  
+                            _categoryid = selectedvalue;
                           });
                         }),
 
@@ -136,23 +146,39 @@ class _screentransactionState extends State<screentransaction> {
                   ],
                 ))));
   }
+
+  Future<void> addtransaction() async {
+    final _purposeText = _purposeTextEditingcontroller.text;
+    final _amountText = _amoutnTextEditingcontroller.text;
+
+    if (_purposeText.isEmpty) {
+      return;
+    }
+    if (_amountText.isEmpty) {
+      return;
+    }
+    if (_categoryid == null) {
+      return;
+    }
+    if (_selectedDate == null) {
+      return;
+    }
+    if(_selectedCategoryModel == null){
+      return;
+    }
+
+    final _parsedAmount= double.tryParse(_amountText);
+    if(_parsedAmount == null){
+      return;
+    }
+
+    final _model= transactionModel(
+        purpose: _purposeText,
+        amount: _parsedAmount,
+        date: _selectedDate!,
+        type: _selectedCategorytype!,
+        category: _selectedCategoryModel!);
+
+        TransactionDB.instance.addTransaction(_model);
+  }
 }
-
-
- /*
- Radio(
-                                value: categoryType.income,
-                                groupValue: categoryType.income,
-                                onChanged: (newvalue) {}),
-                            const Text("income")
-                          ],
-                        ),
-                        Row(
-                          children: [
-                            Radio(
-                                value: categoryType.expense,
-                                groupValue: categoryType.expense,
-                                onChanged: (newvalue) {}),
-                            const Text("Expense"),
-                          ],
-                        ), */
