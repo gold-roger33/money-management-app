@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:p_money_management/db/category/category_db.dart';
 import 'package:p_money_management/model/category/category_model.dart';
 
-ValueNotifier<categoryType> selectedcategoryNotifier = ValueNotifier(categoryType.income);
-
 class screentransaction extends StatefulWidget {
   static const routname = "add-transactions";
   const screentransaction({super.key});
@@ -16,6 +14,14 @@ class _screentransactionState extends State<screentransaction> {
   DateTime? _selectedDate;
   categoryType? _selectedCategorytype;
   categoryModel? _selectedCategoryModel;
+  
+  String? _categoryid;
+
+  @override
+  void initState() {
+    _selectedCategorytype = categoryType.income;
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -72,34 +78,29 @@ class _screentransactionState extends State<screentransaction> {
                       children: [
                         Row(
                           children: [
-                            ValueListenableBuilder(
-                              valueListenable:selectedcategoryNotifier,
-                              builder: (BuildContext ctx,
-                                  categoryType newCategory, Widget? _) {
-                                return Radio<categoryType>(
-                                  value: categoryType.income,
-                                  groupValue: newCategory,
-                                  onChanged: (newvalue) {
-                                    selectedcategoryNotifier.value = newvalue!;
-                                  },
-                                );
+                            Radio(
+                              value: categoryType.income,
+                              groupValue: _selectedCategorytype,
+                              onChanged: (newvalue) {
+                                setState(() {
+                                  _selectedCategorytype = categoryType.income;
+                                  _categoryid = null;
+                                });
                               },
                             ),
                             const Text("Income"),
                           ],
                         ),
                         Row(
-                           children: [
-                            ValueListenableBuilder(
-                              valueListenable: selectedcategoryNotifier,
-                              builder: (BuildContext ctx,categoryType newCategory, Widget? _) {
-                                return Radio<categoryType>(
-                                  value: categoryType.expense,
-                                  groupValue: newCategory,
-                                  onChanged: (newvalue) {
-                                    selectedcategoryNotifier.value = newvalue!;
-                                  },
-                                );
+                          children: [
+                            Radio(
+                              value: categoryType.expense,
+                              groupValue: _selectedCategorytype,
+                              onChanged: (newvalue) {
+                                setState(() {
+                                  _selectedCategorytype = categoryType.expense;
+                                  _categoryid =null;
+                                });
                               },
                             ),
                             const Text("Expense"),
@@ -111,11 +112,20 @@ class _screentransactionState extends State<screentransaction> {
                     //CATEGORY TYPE
                     DropdownButton(
                         hint: const Text("Select category"),
-                        items: categoryDB.instance.incomecategorylistListener.value.map((e) {
+                        value: _categoryid,
+                        items: (_selectedCategorytype == categoryType.income
+                                ? categoryDB().incomecategorylistListener
+                                : categoryDB().expensecategorylistListener)
+                            .value
+                            .map((e) {
                           return DropdownMenuItem(
                               value: e.id, child: Text(e.name));
                         }).toList(),
-                        onChanged: (savedvalue) {}),
+                        onChanged: (selectedvalue) {
+                          setState(() {
+                          _categoryid=selectedvalue;  
+                          });
+                        }),
 
                     //SUBMIT BUTTON
 
