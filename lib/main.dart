@@ -9,7 +9,7 @@ import 'package:p_money_management/screens/home/home.dart';
 
 Future<void> main() async{
   WidgetsFlutterBinding.ensureInitialized();
-  Hive.initFlutter();
+  await Hive.initFlutter();
 
   if(!Hive.isAdapterRegistered(categoryTypeAdapter().typeId)){
     Hive.registerAdapter(categoryTypeAdapter());
